@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
-using PSO2News.StorageBackends;
 
 namespace PSO2News
 {
@@ -10,21 +12,34 @@ namespace PSO2News
 
         private readonly HttpClient _http;
 
-        private readonly NewsInfoHydrator _hydrator;
-        private readonly Store _store;
-
-        public PSO2NewsTracker(Store storageBackend)
+        public PSO2NewsTracker()
         {
             _http = new HttpClient();
+        }
 
-            _hydrator = new NewsInfoHydrator(_http);
-            _store = storageBackend;
+        public IEnumerable<NewsInfo> GetNews(DateTime after = default, NewsType type = NewsType.Any)
+        {
+            return new NewsInfoEnumerable()
+                .Where(ni => ni.Timestamp > after)
+                .Where(ni => type == NewsType.Any || ni.Type == type);
         }
 
         public void Dispose()
         {
-            _store?.Dispose();
             _http?.Dispose();
+        }
+
+        private class NewsInfoEnumerable : IEnumerable<NewsInfo>
+        {
+            public IEnumerator<NewsInfo> GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
     }
 }

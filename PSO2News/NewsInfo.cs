@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace PSO2News
@@ -6,29 +8,31 @@ namespace PSO2News
     public class NewsInfo
     {
         [JsonProperty("id")]
-        public int Id { get; protected set; }
+        public int Id { get; }
 
         [JsonProperty("type")]
-        public NewsType Type { get; protected set; }
+        public NewsType Type { get; }
 
         [JsonProperty("timestamp")]
-        public DateTime Timestamp { get; protected set; }
+        public DateTime Timestamp { get; }
 
         [JsonProperty("title")]
-        public string Title { get; protected set; }
+        public string Title { get; }
 
         [JsonProperty("url")]
-        public string Url { get; protected set; }
-    }
+        public string Url { get; }
 
-    public enum NewsType
-    {
-        None,
-        Notice,
-        Maintenance,
-        Update,
-        Event,
-        Campaign,
-        Media,
+        private readonly HttpClient _http;
+
+        public NewsInfo(HttpClient http)
+        {
+            _http = http;
+        }
+
+        public async Task<string> GetNewsBodyAsync()
+        {
+            var page = await _http.GetStringAsync(new Uri(Url));
+            return page;
+        }
     }
 }
