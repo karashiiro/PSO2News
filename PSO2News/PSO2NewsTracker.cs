@@ -10,12 +10,14 @@ namespace PSO2News
 
         private readonly HttpClient _http;
 
+        private readonly NewsInfoHydrator _hydrator;
         private readonly Store _store;
 
         public PSO2NewsTracker(Store storageBackend)
         {
             _http = new HttpClient();
 
+            _hydrator = new NewsInfoHydrator(_http);
             _store = storageBackend;
         }
 
