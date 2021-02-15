@@ -2,7 +2,6 @@
 {
     public enum NewsType
     {
-        Any,
         Unknown,
         Notice,
         Recovery,

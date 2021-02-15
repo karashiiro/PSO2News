@@ -11,7 +11,7 @@ namespace PSO2News
 {
     public class PSO2NewsTracker : IDisposable
     {
-        private const string NewsUrl = "http://pso2.jp/players/news/";
+        private const string NewsUrl = "http://pso2.jp/players/news/?page={0}";
         private static readonly Regex TimeRegex = new Regex(@"(?<year>\d{4})\/(?<month>\d{2})\/(?<day>\d{2}) (?<hour>\d{2}):(?<minute>\d{2})", RegexOptions.Compiled);
 
         private readonly HttpClient _http;
@@ -30,11 +30,10 @@ namespace PSO2News
 
         public async IAsyncEnumerable<NewsInfo> GetNews(
             DateTime after = default,
-            NewsType type = NewsType.Any,
             [EnumeratorCancellation] CancellationToken token = default)
         {
             var web = new HtmlWeb();
-            var page = await web.LoadFromWebAsync(NewsUrl, token);
+            var page = await web.LoadFromWebAsync(string.Format(NewsUrl, 1), token);
 
             var list = page.DocumentNode.SelectSingleNode("//section[@class='topic--list']/ul");
 
@@ -45,10 +44,6 @@ namespace PSO2News
 
                 var typeNode = linkNode.SelectSingleNode("span[1]");
                 var newsType = GetNewsType(typeNode.InnerText);
-                if (type != NewsType.Any && newsType != type)
-                {
-                    continue;
-                }
 
                 var titleNode = linkNode.SelectSingleNode("span[2]");
                 var title = titleNode.InnerText;
@@ -64,7 +59,7 @@ namespace PSO2News
                     0);
                 if (parsedTime <= after)
                 {
-                    continue;
+                    break;
                 }
                 
                 yield return new NewsInfo(_http, newsType, parsedTime, title, url.ToString());
