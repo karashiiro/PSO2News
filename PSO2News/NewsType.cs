@@ -3,7 +3,10 @@
     public enum NewsType
     {
         Any,
+        Unknown,
         Notice,
+        Recovery,
+        Important,
         Maintenance,
         Update,
         Event,

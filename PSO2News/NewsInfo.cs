@@ -24,9 +24,15 @@ namespace PSO2News
 
         private readonly HttpClient _http;
 
-        public NewsInfo(HttpClient http)
+        public NewsInfo(HttpClient http, int id, NewsType type, DateTime timestamp, string title, string url)
         {
             _http = http;
+
+            Id = id;
+            Type = type;
+            Timestamp = timestamp;
+            Title = title;
+            Url = url;
         }
 
         public async Task<string> GetNewsBodyAsync()
