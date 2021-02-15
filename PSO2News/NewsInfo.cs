@@ -7,9 +7,6 @@ namespace PSO2News
 {
     public class NewsInfo
     {
-        [JsonProperty("id")]
-        public int Id { get; }
-
         [JsonProperty("type")]
         public NewsType Type { get; }
 
@@ -24,11 +21,10 @@ namespace PSO2News
 
         private readonly HttpClient _http;
 
-        public NewsInfo(HttpClient http, int id, NewsType type, DateTime timestamp, string title, string url)
+        public NewsInfo(HttpClient http, NewsType type, DateTime timestamp, string title, string url)
         {
             _http = http;
 
-            Id = id;
             Type = type;
             Timestamp = timestamp;
             Title = title;
