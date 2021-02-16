@@ -53,8 +53,7 @@ namespace PSO2News.Content
         private static readonly Regex TimeEmergencyUndecidedRegex = new(@"緊急メンテナンス予定時間\s+(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(終了時刻)?未定", RegexOptions.Compiled);
         private static readonly Regex TimeEmergencyUndecidedRegexEx = new(@"(?<month>\d{1,2})\/(?<day>\d{1,2}).+(?<startHour>\d{1,2})：(?<startMinute>\d{2}).*緊急メンテナンス", RegexOptions.Compiled);
         private static readonly Regex TimeServerEquipmentRegex = new(@"(?<month>\d{1,2})月(?<day>\d{1,2})日（.）の?(?<startHour>\d{1,2}):(?<startMinute>\d{2})～(?<endHour>\d{1,2}):(?<endMinute>\d{2})までの間、サーバー機器メンテナンスを実施(いた)?します。", RegexOptions.Compiled);
-        private static readonly Regex TimeNARegex = new(@"Maintenance Starts:\s*(?<startMonth>\d{1,2})\/(?<startDay>\d{1,2})\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s*(?<startMeridiem>\S*).*(?<endMonth>\d{1,2})\/(?<endDay>\d{1,2})\s*(?<endHour>\d{1,2}):(?<endMinute>\d{2})\s*(?<endMeridiem>\S*)", RegexOptions.Compiled | RegexOptions.Singleline);
-
+        
         public async Task<MaintenanceNewsInfo> Parse(CancellationToken token)
         {
             var web = new HtmlWeb();
@@ -88,7 +87,6 @@ namespace PSO2News.Content
             var timeEmergencyUndecided = TimeEmergencyUndecidedRegex.Match(Body);
             var timeEmergencyUndecidedEx = TimeEmergencyUndecidedRegexEx.Match(Body);
             var timeServerEquipment = TimeServerEquipmentRegex.Match(Body);
-            var timeNA = TimeNARegex.Match(Body);
 
             int year, month, day, startHour, startMinute, endHour, endMinute;
             if (time.Success)
@@ -406,42 +404,6 @@ namespace PSO2News.Content
                 startMinute = int.Parse(timeParts["startMinute"].Value);
                 endHour = int.Parse(timeParts["endHour"].Value);
                 endMinute = int.Parse(timeParts["endMinute"].Value);
-            }
-            else if (timeNA.Success)
-            {
-                if (Title.ToLowerInvariant().Contains("emergency") && !Title.ToLowerInvariant().Contains("now open"))
-                {
-                    Reason = MaintenanceNewsReason.Emergency;
-                }
-
-                var timeParts = timeNA.Groups;
-
-                year = Timestamp.Year;
-
-                var startMonth = int.Parse(timeParts["startMonth"].Value);
-                var startDay = int.Parse(timeParts["startDay"].Value);
-                startHour = int.Parse(timeParts["startHour"].Value);
-                startMinute = int.Parse(timeParts["startMinute"].Value);
-                var startMeridiem = timeParts["startMeridiem"].Value;
-                if (startMeridiem.ToLowerInvariant() == "pm")
-                {
-                    startHour += 12;
-                }
-
-                var endMonth = int.Parse(timeParts["endMonth"].Value);
-                var endDay = int.Parse(timeParts["endDay"].Value);
-                endHour = int.Parse(timeParts["endHour"].Value);
-                endMinute = int.Parse(timeParts["endMinute"].Value);
-                var endMeridiem = timeParts["endMeridiem"].Value;
-                if (endMeridiem.ToLowerInvariant() == "pm")
-                {
-                    endHour += 12;
-                }
-
-                StartTime = new DateTime(year, startMonth, startDay, startHour, startMinute, 0);
-                EndTime = new DateTime(year, endMonth, endDay, endHour, endMinute, 0);
-
-                return this;
             }
             else
             {

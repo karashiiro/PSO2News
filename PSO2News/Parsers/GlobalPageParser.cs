@@ -38,12 +38,12 @@ namespace PSO2News.Parsers
 
                 foreach (var newsInfo in list.SelectNodes("li"))
                 {
-                    var linkNode = newsInfo.SelectSingleNode("div[@class='content']/div[@class='bottom']/a[@class='read-more']");
-                    var onClickFunc = linkNode.GetAttributeValue("onclick", "");
-                    var url = GetNewsUrl(BaseUrl, onClickFunc);
-
                     var typeNode = newsInfo.SelectSingleNode("div[@class='content']/div[@class='bottom']/p[@class='tag']");
                     var newsType = ParseUtil.GetNewsTypeNA(typeNode.InnerText);
+
+                    var linkNode = newsInfo.SelectSingleNode("div[@class='content']/div[@class='bottom']/a[@class='read-more']");
+                    var onClickFunc = linkNode.GetAttributeValue("onclick", "");
+                    var url = GetNewsUrl(BaseUrl, onClickFunc, typeNode.InnerText.ToLowerInvariant().Replace(' ', '-'));
 
                     var titleNode = newsInfo.SelectSingleNode("div[@class='content']/h3");
                     var title = titleNode.InnerText.Trim();
@@ -67,13 +67,13 @@ namespace PSO2News.Parsers
             } while (curPage < maxPages);
         }
 
-        private static readonly Regex OnClickFuncRegex = new(@"\(ShowDetails\('(?<postId>\S+)', '(?<type>\S+)'\)\)", RegexOptions.Compiled);
-        private static string GetNewsUrl(string baseUrl, string onClickFunc)
+        private static readonly Regex OnClickFuncRegex = new(@"\(ShowDetails\('(?<postId>\S+)', '\S+'\)\)", RegexOptions.Compiled);
+        private static string GetNewsUrl(string baseUrl, string onClickFunc, string type)
         {
             var match = OnClickFuncRegex.Match(onClickFunc);
             if (match.Success)
             {
-                return baseUrl + '/' + match.Groups["type"] + '/' + match.Groups["postId"];
+                return baseUrl + '/' + type + '/' + match.Groups["postId"];
             }
 
             return "";
