@@ -5,41 +5,53 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using PSO2News.Content;
+using PSO2News.SiteInfo;
 
 namespace PSO2News
 {
-    public static class PSO2NewsTracker
+    public class PSO2NewsTracker
     {
-        private const string NewsUrl = "http://pso2.jp/players/news/";
         private static readonly Regex TimeRegex = new Regex(@"(?<year>\d{4})\/(?<month>\d{2})\/(?<day>\d{2}) (?<hour>\d{2}):(?<minute>\d{2})", RegexOptions.Compiled);
 
-        public static async IAsyncEnumerable<NewsInfo> GetNews(
+        private readonly NewsSiteInfo _siteInfo;
+
+        public PSO2NewsTracker(NewsSource source)
+        {
+            _siteInfo = source switch
+            {
+                NewsSource.PSO2 => new PSO2SiteInfo(),
+                NewsSource.NGS => new NGSSiteInfo(),
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        public async IAsyncEnumerable<NewsInfo> GetNews(
             DateTime after = default,
             [EnumeratorCancellation] CancellationToken token = default)
         {
-            var curUrl = NewsUrl;
+            var curUrl = _siteInfo.BaseUrl;
             do
             {
                 var web = new HtmlWeb();
                 var page = await web.LoadFromWebAsync(curUrl, token);
 
-                var nextButton = page.DocumentNode.SelectSingleNode("//li[@class='pager--next']/a");
+                var nextButton = page.DocumentNode.SelectSingleNode(_siteInfo.NextButtonSelector);
                 curUrl = nextButton?.GetAttributeValue("href", null);
 
-                var list = page.DocumentNode.SelectSingleNode("//section[@class='topic--list']/ul");
+                var list = page.DocumentNode.SelectSingleNode(_siteInfo.UlSelector);
 
                 foreach (var newsInfo in list.SelectNodes("li"))
                 {
-                    var linkNode = newsInfo.SelectSingleNode("a");
+                    var linkNode = newsInfo.SelectSingleNode(_siteInfo.LinkSelector);
                     var url = linkNode.GetAttributeValue("href", "");
 
-                    var typeNode = linkNode.SelectSingleNode("span[1]");
+                    var typeNode = linkNode.SelectSingleNode(_siteInfo.TypeSelector);
                     var newsType = GetNewsType(typeNode.InnerText);
 
-                    var titleNode = linkNode.SelectSingleNode("span[2]");
+                    var titleNode = linkNode.SelectSingleNode(_siteInfo.TitleSelector);
                     var title = titleNode.InnerText;
 
-                    var timeNode = linkNode.SelectSingleNode("span[3]/time");
+                    var timeNode = linkNode.SelectSingleNode(_siteInfo.TimeSelector);
                     var timeParts = TimeRegex.Match(timeNode.InnerText).Groups;
                     var parsedTime = new DateTime(
                         int.Parse(timeParts["year"].Value),
@@ -57,7 +69,7 @@ namespace PSO2News
                     {
                         NewsType.Maintenance => await new MaintenanceNewsInfo(newsType, parsedTime, title, url).Parse(token),
                         NewsType.Notice when url.Contains("/comic") => await new ComicNewsInfo(newsType, parsedTime, title, url).Parse(token),
-                        _ => new NewsInfo(newsType, parsedTime, title, url)
+                        _ => new NewsInfo(newsType, parsedTime, title, url),
                     };
                 }
             } while (curUrl != null);

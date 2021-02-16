@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using PSO2News;
-using PSO2News.Content;
 
 namespace Testbed
 {
@@ -10,10 +9,10 @@ namespace Testbed
     {
         public static async Task Main()
         {
-            await foreach (var post in PSO2NewsTracker.GetNews().Where(n => n.Type == NewsType.Notice))
+            var tracker = new PSO2NewsTracker(NewsSource.NGS);
+            await foreach (var post in tracker.GetNews().Where(n => n.Type == NewsType.Notice))
             {
-                if (!(post is ComicNewsInfo cni)) continue;
-                Console.WriteLine("{0}\n{1}\n\t{2}", cni.Url, cni.Title, cni.ImageUrl);
+                Console.WriteLine(post.Title);
             }
         }
     }
