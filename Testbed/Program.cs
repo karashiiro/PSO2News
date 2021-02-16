@@ -10,10 +10,10 @@ namespace Testbed
     {
         public static async Task Main()
         {
-            await foreach (var post in PSO2NewsTracker.GetNews().Where(n => n.Type == NewsType.Maintenance))
+            await foreach (var post in PSO2NewsTracker.GetNews().Where(n => n.Type == NewsType.Notice))
             {
-                if (!(post is MaintenanceNewsInfo mni)) continue;
-                Console.WriteLine("{0}\n{1}: {2}\n\t{3}\n\t{4}", mni.Url, mni.Reason, mni.Title, mni.StartTime.ToShortTimeString(), mni.EndTime.ToShortTimeString());
+                if (!(post is ComicNewsInfo cni)) continue;
+                Console.WriteLine("{0}\n{1}\n\t{2}", cni.Url, cni.Title, cni.ImageUrl);
             }
         }
     }

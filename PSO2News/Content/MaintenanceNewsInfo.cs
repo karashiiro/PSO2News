@@ -54,7 +54,7 @@ namespace PSO2News.Content
         private static readonly Regex TimeEmergencyUndecidedRegexEx = new Regex(@"(?<month>\d{1,2})\/(?<day>\d{1,2}).+(?<startHour>\d{1,2})：(?<startMinute>\d{2}).*緊急メンテナンス", RegexOptions.Compiled);
         private static readonly Regex TimeServerEquipmentRegex = new Regex(@"(?<month>\d{1,2})月(?<day>\d{1,2})日（.）の?(?<startHour>\d{1,2}):(?<startMinute>\d{2})～(?<endHour>\d{1,2}):(?<endMinute>\d{2})までの間、サーバー機器メンテナンスを実施(いた)?します。", RegexOptions.Compiled);
 
-        public async Task<MaintenanceNewsInfo> Initialize(CancellationToken token)
+        public async Task<MaintenanceNewsInfo> Parse(CancellationToken token)
         {
             var web = new HtmlWeb();
 

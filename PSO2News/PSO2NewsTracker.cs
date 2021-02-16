@@ -31,7 +31,7 @@ namespace PSO2News
                 foreach (var newsInfo in list.SelectNodes("li"))
                 {
                     var linkNode = newsInfo.SelectSingleNode("a");
-                    var url = new Uri(linkNode.GetAttributeValue("href", ""));
+                    var url = linkNode.GetAttributeValue("href", "");
 
                     var typeNode = linkNode.SelectSingleNode("span[1]");
                     var newsType = GetNewsType(typeNode.InnerText);
@@ -55,8 +55,9 @@ namespace PSO2News
 
                     yield return newsType switch
                     {
-                        NewsType.Maintenance => await new MaintenanceNewsInfo(newsType, parsedTime, title, url.ToString()).Initialize(token),
-                        _ => new NewsInfo(newsType, parsedTime, title, url.ToString()),
+                        NewsType.Maintenance => await new MaintenanceNewsInfo(newsType, parsedTime, title, url).Parse(token),
+                        NewsType.Notice when url.Contains("/comic") => await new ComicNewsInfo(newsType, parsedTime, title, url).Parse(token),
+                        _ => new NewsInfo(newsType, parsedTime, title, url)
                     };
                 }
             } while (curUrl != null);
