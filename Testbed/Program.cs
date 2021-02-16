@@ -9,7 +9,7 @@ namespace Testbed
         public static async Task Main()
         {
             var newsTracker = new PSO2NewsTracker();
-            await foreach (var news in newsTracker.GetNews())
+            await foreach (var news in newsTracker.GetNews(after: new DateTime(2021, 1, 1)))
             {
                 Console.WriteLine(news.Title);
             }

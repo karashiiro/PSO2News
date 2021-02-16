@@ -11,7 +11,7 @@ namespace PSO2News
 {
     public class PSO2NewsTracker : IDisposable
     {
-        private const string NewsUrl = "http://pso2.jp/players/news/?page={0}";
+        private const string NewsUrl = "http://pso2.jp/players/news/";
         private static readonly Regex TimeRegex = new Regex(@"(?<year>\d{4})\/(?<month>\d{2})\/(?<day>\d{2}) (?<hour>\d{2}):(?<minute>\d{2})", RegexOptions.Compiled);
 
         private readonly HttpClient _http;
@@ -32,38 +32,45 @@ namespace PSO2News
             DateTime after = default,
             [EnumeratorCancellation] CancellationToken token = default)
         {
-            var web = new HtmlWeb();
-            var page = await web.LoadFromWebAsync(string.Format(NewsUrl, 1), token);
-
-            var list = page.DocumentNode.SelectSingleNode("//section[@class='topic--list']/ul");
-
-            foreach (var newsInfo in list.SelectNodes("li"))
+            var curUrl = NewsUrl;
+            do
             {
-                var linkNode = newsInfo.SelectSingleNode("a");
-                var url = new Uri(linkNode.GetAttributeValue("href", ""));
+                var web = new HtmlWeb();
+                var page = await web.LoadFromWebAsync(curUrl, token);
 
-                var typeNode = linkNode.SelectSingleNode("span[1]");
-                var newsType = GetNewsType(typeNode.InnerText);
+                var nextButton = page.DocumentNode.SelectSingleNode("//li[@class='pager--next']/a");
+                curUrl = nextButton?.GetAttributeValue("href", null);
 
-                var titleNode = linkNode.SelectSingleNode("span[2]");
-                var title = titleNode.InnerText;
+                var list = page.DocumentNode.SelectSingleNode("//section[@class='topic--list']/ul");
 
-                var timeNode = linkNode.SelectSingleNode("span[3]/time");
-                var timeParts = TimeRegex.Match(timeNode.InnerText).Groups;
-                var parsedTime = new DateTime(
-                    int.Parse(timeParts["year"].Value),
-                    int.Parse(timeParts["month"].Value),
-                    int.Parse(timeParts["day"].Value),
-                    int.Parse(timeParts["hour"].Value),
-                    int.Parse(timeParts["minute"].Value),
-                    0);
-                if (parsedTime <= after)
+                foreach (var newsInfo in list.SelectNodes("li"))
                 {
-                    break;
+                    var linkNode = newsInfo.SelectSingleNode("a");
+                    var url = new Uri(linkNode.GetAttributeValue("href", ""));
+
+                    var typeNode = linkNode.SelectSingleNode("span[1]");
+                    var newsType = GetNewsType(typeNode.InnerText);
+
+                    var titleNode = linkNode.SelectSingleNode("span[2]");
+                    var title = titleNode.InnerText;
+
+                    var timeNode = linkNode.SelectSingleNode("span[3]/time");
+                    var timeParts = TimeRegex.Match(timeNode.InnerText).Groups;
+                    var parsedTime = new DateTime(
+                        int.Parse(timeParts["year"].Value),
+                        int.Parse(timeParts["month"].Value),
+                        int.Parse(timeParts["day"].Value),
+                        int.Parse(timeParts["hour"].Value),
+                        int.Parse(timeParts["minute"].Value),
+                        0);
+                    if (parsedTime <= after)
+                    {
+                        yield break;
+                    }
+
+                    yield return new NewsInfo(_http, newsType, parsedTime, title, url.ToString());
                 }
-                
-                yield return new NewsInfo(_http, newsType, parsedTime, title, url.ToString());
-            }
+            } while (curUrl != null);
         }
 
         private static NewsType GetNewsType(string typeName)
@@ -93,7 +100,7 @@ namespace PSO2News
         {
             if (disposed) return;
 
-            if (_externalHttpClient)
+            if (!_externalHttpClient)
             {
                 _http?.Dispose();
             }
