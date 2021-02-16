@@ -3,7 +3,7 @@
     public enum NewsType
     {
         Unknown,
-        Notice,
+        Announcement,
         Recovery,
         Important,
         FAQ,
@@ -14,5 +14,10 @@
         Event,
         Campaign,
         Media,
+
+        // Some Global-specific types
+        ScratchTicket,
+        UrgentQuest,
+        Blog,
     }
 }

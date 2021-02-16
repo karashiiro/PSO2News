@@ -32,27 +32,28 @@ namespace PSO2News.Content
 
         public MaintenanceNewsInfo(NewsType type, DateTime timestamp, string title, string url) : base(type, timestamp, title, url) { }
 
-        private static readonly Regex TimeRegex = new Regex(@"(?<year>\d{4})年(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled);
-        private static readonly Regex TimeRegexEx = new Regex(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2}).+メンテナンス終了予定時(刻|間)\s(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled | RegexOptions.Singleline);
-        private static readonly Regex TimeCloudRegex = new Regex(@"下記の予定にて、“クラウド”版のゲームサーバーの\S*メンテナンスを行います。.+(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled | RegexOptions.Singleline);
-        private static readonly Regex TimeNoYearRegex = new Regex(@"(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled);
-        private static readonly Regex TimeNoYearMultiDayRegex = new Regex(@"(?<startMonth>\d{1,2})月(?<startDay>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(?<endMonth>\d{1,2})月(?<endDay>\d{1,2})日（.）(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled);
-        private static readonly Regex TimeUndecidedRegex = new Regex(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2})より.+\S*メンテナンス終了予定時刻\s+(?<year>\d{4})年(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s+未定", RegexOptions.Compiled | RegexOptions.Singleline);
-        private static readonly Regex TimeRecapRegex = new Regex(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2})からの\S*メンテナンスは、(?<endHour>\d{1,2}):(?<endMinute>\d{2})を?もちまして終了(いた)?しました。", RegexOptions.Compiled);
-        private static readonly Regex TimeRecapMultiDayRegex = new Regex(@"(?<startMonth>\d{1,2})月(?<startDay>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})からの?\S*メンテナンスは、(?<endMonth>\d{1,2})月(?<endDay>\d{1,2})日（.）(?<endHour>\d{1,2}):(?<endMinute>\d{2})をもちまして終了(いた)?しました。", RegexOptions.Compiled);
-        private static readonly Regex TimeRecapCloudRegex = new Regex(@"(?<year>\d{4})\/(?<month>\d{1,2})\/(?<day>\d{1,2}).+本日(?<startHour>\d{1,2}):(?<startMinute>\d{2})からの“クラウド”版の?\S*メンテナンスは、(?<endHour>\d{1,2}):(?<endMinute>\d{2})をもちまして終了(いた)?しました。", RegexOptions.Compiled | RegexOptions.Singleline);
-        private static readonly Regex TimeRecapCloudRegexEx = new Regex(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2})からの“クラウド”版定期メンテナンスは、(?<endHour>\d{1,2}):(?<endMinute>\d{2})をもちまして終了(いた)?しました。", RegexOptions.Compiled);
-        private static readonly Regex TimeRecapRegexEx = new Regex(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2}).+(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled);
-        private static readonly Regex TimeRecapRegexEx2 = new Regex(@"本日.*(?<startHour>\d{1,2}):(?<startMinute>\d{2})より行.*メンテナンスは、(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled | RegexOptions.Singleline);
-        private static readonly Regex TimeAdjustRegex = new Regex(@"→　(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled);
-        private static readonly Regex TimeAdjustRegexEx = new Regex(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2})より行っております定期メンテナンスにつきまして、.+\S*メンテナンス終了予定時刻.+(?<year>\d{4})年(?<month>\d{1,2})月(?<day>\d{1,2})日（.）(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled | RegexOptions.Singleline);
-        private static readonly Regex TimeAdjustUndecidedRegex = new Regex(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2}).*(?<year>\d{4})年(?<month>\d{1,2})月(?<day>\d{1,2})日（.）未定", RegexOptions.Compiled | RegexOptions.Singleline);
-        private static readonly Regex TimeAdjustUndecidedNoYearRegex = new Regex(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2}).*(?<month>\d{1,2})月(?<day>\d{1,2})日（.）未定", RegexOptions.Compiled | RegexOptions.Singleline);
-        private static readonly Regex TimeAdjustUndecidedCloudRegex = new Regex(@"(?<year>\d{4})\/(?<month>\d{1,2})\/(?<day>\d{1,2}) (?<startHour>\d{1,2}):(?<startMinute>\d{2}).+“クラウド”版の?\S*メンテナンス.+未定", RegexOptions.Compiled | RegexOptions.Singleline);
-        private static readonly Regex TimeEmergencyRegex = new Regex(@"緊急メンテナンス予定時間\s+(?<startMonth>\d{1,2})月(?<startDay>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(?<endMonth>\d{1,2})月(?<endDay>\d{1,2})日（.）(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled);
-        private static readonly Regex TimeEmergencyUndecidedRegex = new Regex(@"緊急メンテナンス予定時間\s+(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(終了時刻)?未定", RegexOptions.Compiled);
-        private static readonly Regex TimeEmergencyUndecidedRegexEx = new Regex(@"(?<month>\d{1,2})\/(?<day>\d{1,2}).+(?<startHour>\d{1,2})：(?<startMinute>\d{2}).*緊急メンテナンス", RegexOptions.Compiled);
-        private static readonly Regex TimeServerEquipmentRegex = new Regex(@"(?<month>\d{1,2})月(?<day>\d{1,2})日（.）の?(?<startHour>\d{1,2}):(?<startMinute>\d{2})～(?<endHour>\d{1,2}):(?<endMinute>\d{2})までの間、サーバー機器メンテナンスを実施(いた)?します。", RegexOptions.Compiled);
+        private static readonly Regex TimeRegex = new(@"(?<year>\d{4})年(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled);
+        private static readonly Regex TimeRegexEx = new(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2}).+メンテナンス終了予定時(刻|間)\s(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex TimeCloudRegex = new(@"下記の予定にて、“クラウド”版のゲームサーバーの\S*メンテナンスを行います。.+(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex TimeNoYearRegex = new(@"(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled);
+        private static readonly Regex TimeNoYearMultiDayRegex = new(@"(?<startMonth>\d{1,2})月(?<startDay>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(?<endMonth>\d{1,2})月(?<endDay>\d{1,2})日（.）(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled);
+        private static readonly Regex TimeUndecidedRegex = new(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2})より.+\S*メンテナンス終了予定時刻\s+(?<year>\d{4})年(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s+未定", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex TimeRecapRegex = new(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2})からの\S*メンテナンスは、(?<endHour>\d{1,2}):(?<endMinute>\d{2})を?もちまして終了(いた)?しました。", RegexOptions.Compiled);
+        private static readonly Regex TimeRecapMultiDayRegex = new(@"(?<startMonth>\d{1,2})月(?<startDay>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})からの?\S*メンテナンスは、(?<endMonth>\d{1,2})月(?<endDay>\d{1,2})日（.）(?<endHour>\d{1,2}):(?<endMinute>\d{2})をもちまして終了(いた)?しました。", RegexOptions.Compiled);
+        private static readonly Regex TimeRecapCloudRegex = new(@"(?<year>\d{4})\/(?<month>\d{1,2})\/(?<day>\d{1,2}).+本日(?<startHour>\d{1,2}):(?<startMinute>\d{2})からの“クラウド”版の?\S*メンテナンスは、(?<endHour>\d{1,2}):(?<endMinute>\d{2})をもちまして終了(いた)?しました。", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex TimeRecapCloudRegexEx = new(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2})からの“クラウド”版定期メンテナンスは、(?<endHour>\d{1,2}):(?<endMinute>\d{2})をもちまして終了(いた)?しました。", RegexOptions.Compiled);
+        private static readonly Regex TimeRecapRegexEx = new(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2}).+(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled);
+        private static readonly Regex TimeRecapRegexEx2 = new(@"本日.*(?<startHour>\d{1,2}):(?<startMinute>\d{2})より行.*メンテナンスは、(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex TimeAdjustRegex = new(@"→　(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled);
+        private static readonly Regex TimeAdjustRegexEx = new(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2})より行っております定期メンテナンスにつきまして、.+\S*メンテナンス終了予定時刻.+(?<year>\d{4})年(?<month>\d{1,2})月(?<day>\d{1,2})日（.）(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex TimeAdjustUndecidedRegex = new(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2}).*(?<year>\d{4})年(?<month>\d{1,2})月(?<day>\d{1,2})日（.）未定", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex TimeAdjustUndecidedNoYearRegex = new(@"本日(?<startHour>\d{1,2}):(?<startMinute>\d{2}).*(?<month>\d{1,2})月(?<day>\d{1,2})日（.）未定", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex TimeAdjustUndecidedCloudRegex = new(@"(?<year>\d{4})\/(?<month>\d{1,2})\/(?<day>\d{1,2}) (?<startHour>\d{1,2}):(?<startMinute>\d{2}).+“クラウド”版の?\S*メンテナンス.+未定", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex TimeEmergencyRegex = new(@"緊急メンテナンス予定時間\s+(?<startMonth>\d{1,2})月(?<startDay>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(?<endMonth>\d{1,2})月(?<endDay>\d{1,2})日（.）(?<endHour>\d{1,2}):(?<endMinute>\d{2})", RegexOptions.Compiled);
+        private static readonly Regex TimeEmergencyUndecidedRegex = new(@"緊急メンテナンス予定時間\s+(?<month>\d{1,2})月(?<day>\d{1,2})日（.）\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s?～\s?(終了時刻)?未定", RegexOptions.Compiled);
+        private static readonly Regex TimeEmergencyUndecidedRegexEx = new(@"(?<month>\d{1,2})\/(?<day>\d{1,2}).+(?<startHour>\d{1,2})：(?<startMinute>\d{2}).*緊急メンテナンス", RegexOptions.Compiled);
+        private static readonly Regex TimeServerEquipmentRegex = new(@"(?<month>\d{1,2})月(?<day>\d{1,2})日（.）の?(?<startHour>\d{1,2}):(?<startMinute>\d{2})～(?<endHour>\d{1,2}):(?<endMinute>\d{2})までの間、サーバー機器メンテナンスを実施(いた)?します。", RegexOptions.Compiled);
+        private static readonly Regex TimeNARegex = new(@"Maintenance Starts:\s*(?<startMonth>\d{1,2})\/(?<startDay>\d{1,2})\s*(?<startHour>\d{1,2}):(?<startMinute>\d{2})\s*(?<startMeridiem>\S*).*(?<endMonth>\d{1,2})\/(?<endDay>\d{1,2})\s*(?<endHour>\d{1,2}):(?<endMinute>\d{2})\s*(?<endMeridiem>\S*)", RegexOptions.Compiled | RegexOptions.Singleline);
 
         public async Task<MaintenanceNewsInfo> Parse(CancellationToken token)
         {
@@ -87,6 +88,7 @@ namespace PSO2News.Content
             var timeEmergencyUndecided = TimeEmergencyUndecidedRegex.Match(Body);
             var timeEmergencyUndecidedEx = TimeEmergencyUndecidedRegexEx.Match(Body);
             var timeServerEquipment = TimeServerEquipmentRegex.Match(Body);
+            var timeNA = TimeNARegex.Match(Body);
 
             int year, month, day, startHour, startMinute, endHour, endMinute;
             if (time.Success)
@@ -404,6 +406,42 @@ namespace PSO2News.Content
                 startMinute = int.Parse(timeParts["startMinute"].Value);
                 endHour = int.Parse(timeParts["endHour"].Value);
                 endMinute = int.Parse(timeParts["endMinute"].Value);
+            }
+            else if (timeNA.Success)
+            {
+                if (Title.ToLowerInvariant().Contains("emergency") && !Title.ToLowerInvariant().Contains("now open"))
+                {
+                    Reason = MaintenanceNewsReason.Emergency;
+                }
+
+                var timeParts = timeNA.Groups;
+
+                year = Timestamp.Year;
+
+                var startMonth = int.Parse(timeParts["startMonth"].Value);
+                var startDay = int.Parse(timeParts["startDay"].Value);
+                startHour = int.Parse(timeParts["startHour"].Value);
+                startMinute = int.Parse(timeParts["startMinute"].Value);
+                var startMeridiem = timeParts["startMeridiem"].Value;
+                if (startMeridiem.ToLowerInvariant() == "pm")
+                {
+                    startHour += 12;
+                }
+
+                var endMonth = int.Parse(timeParts["endMonth"].Value);
+                var endDay = int.Parse(timeParts["endDay"].Value);
+                endHour = int.Parse(timeParts["endHour"].Value);
+                endMinute = int.Parse(timeParts["endMinute"].Value);
+                var endMeridiem = timeParts["endMeridiem"].Value;
+                if (endMeridiem.ToLowerInvariant() == "pm")
+                {
+                    endHour += 12;
+                }
+
+                StartTime = new DateTime(year, startMonth, startDay, startHour, startMinute, 0);
+                EndTime = new DateTime(year, endMonth, endDay, endHour, endMinute, 0);
+
+                return this;
             }
             else
             {

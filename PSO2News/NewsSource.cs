@@ -4,5 +4,6 @@
     {
         PSO2,
         NGS,
+        Global,
     }
 }

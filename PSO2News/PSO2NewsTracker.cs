@@ -16,6 +16,7 @@ namespace PSO2News
             {
                 NewsSource.PSO2 => new PSO2PageParser(),
                 NewsSource.NGS => new NGSPageParser(),
+                NewsSource.Global => new GlobalPageParser(),
                 _ => throw new NotImplementedException(),
             };
         }

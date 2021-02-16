@@ -54,7 +54,7 @@ namespace PSO2News.Parsers
                     var newsType = ParseUtil.GetNewsTypeJP(typeNode.InnerText);
 
                     var titleNode = linkNode.SelectSingleNode(TitleSelector);
-                    var title = titleNode.InnerText;
+                    var title = titleNode.InnerText.Trim();
 
                     var timeNode = linkNode.SelectSingleNode(TimeSelector);
                     var timeParts = ParseUtil.TimeRegexJP.Match(timeNode.InnerText).Groups;
@@ -73,7 +73,7 @@ namespace PSO2News.Parsers
                     yield return newsType switch
                     {
                         NewsType.Maintenance => await new MaintenanceNewsInfo(newsType, parsedTime, title, url).Parse(token),
-                        NewsType.Notice when url.Contains("/comic") => await new ComicNewsInfo(newsType, parsedTime, title, url).Parse(token),
+                        NewsType.Announcement when url.Contains("/comic") => await new ComicNewsInfo(newsType, parsedTime, title, url).Parse(token),
                         _ => new NewsInfo(newsType, parsedTime, title, url),
                     };
                 }
