@@ -9,7 +9,7 @@ namespace Testbed
     {
         public static async Task Main()
         {
-            var tracker = new PSO2NewsTracker(NewsSource.NGS);
+            var tracker = new PSO2NewsTracker(NewsSource.PSO2);
             await foreach (var post in tracker.GetNews().Where(n => n.Type == NewsType.Notice))
             {
                 Console.WriteLine(post.Title);
