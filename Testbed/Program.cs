@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using PSO2News;
+using PSO2News.Content;
 
 namespace Testbed
 {
@@ -9,9 +11,12 @@ namespace Testbed
         public static async Task Main()
         {
             var newsTracker = new PSO2NewsTracker();
-            await foreach (var news in newsTracker.GetNews(after: new DateTime(2021, 1, 1)))
+            var maintenancePost = await newsTracker.GetNews().FirstOrDefaultAsync(n => n.Type == NewsType.Maintenance);
+            if (maintenancePost is MaintenanceNewsInfo mni)
             {
-                Console.WriteLine(news.Title);
+                Console.WriteLine(mni.StartTime.ToShortTimeString());
+                Console.WriteLine(mni.EndTime.ToShortTimeString());
+                Console.WriteLine(mni.Body);
             }
         }
     }

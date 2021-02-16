@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace PSO2News
+namespace PSO2News.Content
 {
     public class NewsInfo
     {
@@ -19,22 +17,12 @@ namespace PSO2News
         [JsonProperty("url")]
         public string Url { get; }
 
-        private readonly HttpClient _http;
-
-        public NewsInfo(HttpClient http, NewsType type, DateTime timestamp, string title, string url)
+        public NewsInfo(NewsType type, DateTime timestamp, string title, string url)
         {
-            _http = http;
-
             Type = type;
             Timestamp = timestamp;
             Title = title;
             Url = url;
-        }
-
-        public async Task<string> GetNewsBodyAsync()
-        {
-            var page = await _http.GetStringAsync(new Uri(Url));
-            return page;
         }
     }
 }

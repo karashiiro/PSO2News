@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
+using PSO2News.Content;
 
 namespace PSO2News
 {
@@ -68,7 +69,11 @@ namespace PSO2News
                         yield break;
                     }
 
-                    yield return new NewsInfo(_http, newsType, parsedTime, title, url.ToString());
+                    yield return newsType switch
+                    {
+                        NewsType.Maintenance => await new MaintenanceNewsInfo(newsType, parsedTime, title, url.ToString()).Initialize(token),
+                        _ => new NewsInfo(newsType, parsedTime, title, url.ToString()),
+                    };
                 }
             } while (curUrl != null);
         }
