@@ -1,8 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -10,26 +8,12 @@ using PSO2News.Content;
 
 namespace PSO2News
 {
-    public class PSO2NewsTracker : IDisposable
+    public static class PSO2NewsTracker
     {
         private const string NewsUrl = "http://pso2.jp/players/news/";
         private static readonly Regex TimeRegex = new Regex(@"(?<year>\d{4})\/(?<month>\d{2})\/(?<day>\d{2}) (?<hour>\d{2}):(?<minute>\d{2})", RegexOptions.Compiled);
 
-        private readonly HttpClient _http;
-        private readonly bool _externalHttpClient;
-
-        public PSO2NewsTracker()
-        {
-            _http = new HttpClient();
-        }
-
-        public PSO2NewsTracker(HttpClient http)
-        {
-            _http = http;
-            _externalHttpClient = true;
-        }
-
-        public async IAsyncEnumerable<NewsInfo> GetNews(
+        public static async IAsyncEnumerable<NewsInfo> GetNews(
             DateTime after = default,
             [EnumeratorCancellation] CancellationToken token = default)
         {
@@ -85,6 +69,9 @@ namespace PSO2News
                 "お知らせ" => NewsType.Notice,
                 "復旧" => NewsType.Recovery,
                 "重要" => NewsType.Important,
+                "FAQ" => NewsType.FAQ,
+                "WEB" => NewsType.Web,
+                "対応状況" => NewsType.Bugs,
                 "メンテナンス" => NewsType.Maintenance,
                 "アップデート" => NewsType.Update,
                 "イベント" => NewsType.Event,
@@ -92,23 +79,6 @@ namespace PSO2News
                 "メディア" => NewsType.Media,
                 _ => NewsType.Unknown,
             };
-        }
-
-        private bool _disposed;
-        public void Dispose()
-        {
-            Dispose(_disposed);
-            _disposed = true;
-        }
-
-        private void Dispose(bool disposed)
-        {
-            if (disposed) return;
-
-            if (!_externalHttpClient)
-            {
-                _http?.Dispose();
-            }
         }
     }
 }
