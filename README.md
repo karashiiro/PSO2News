@@ -7,6 +7,9 @@ Supports the following news sites:
 * [PSO2 Global](https://pso2.com/news) (No maintenance parsing)
 * [PSO2 NGS CBT](https://new-gen.pso2.jp/cbt/players/news/)
 
+## Installation
+[`Install-Package PSO2News`](https://www.nuget.org/packages/PSO2News/)
+
 ## Example
 ```csharp
 var tracker = new PSO2NewsTracker(NewsSource.PSO2);
