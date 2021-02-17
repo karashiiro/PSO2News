@@ -19,7 +19,9 @@ namespace PSO2News.Content
 
             var page = await web.LoadFromWebAsync(Url, token);
             var imageNode = page.DocumentNode.SelectSingleNode("//p[@class='comic__image']/img");
-            ImageUrl = new Uri(new Uri(Url), imageNode.GetAttributeValue("src", "")).ToString();
+            ImageUrl = imageNode != null
+                ? new Uri(new Uri(Url), imageNode.GetAttributeValue("src", "")).ToString()
+                : "";
 
             return this;
         }
