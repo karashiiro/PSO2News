@@ -10,7 +10,7 @@ namespace Testbed
     {
         public static async Task Main()
         {
-            var tracker = new PSO2NewsTracker(NewsSource.Global);
+            var tracker = new PSO2NewsTracker(NewsSource.PSO2es);
             await foreach (var post in tracker.GetNews().Where(n => n.Type == NewsType.Maintenance))
             {
                 if (!(post is MaintenanceNewsInfo mni)) continue;

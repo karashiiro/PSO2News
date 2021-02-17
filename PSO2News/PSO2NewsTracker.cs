@@ -15,6 +15,7 @@ namespace PSO2News
             _pageParser = source switch
             {
                 NewsSource.PSO2 => new PSO2PageParser(),
+                NewsSource.PSO2es => new PSO2esPageParser(),
                 NewsSource.NGS => new NGSPageParser(),
                 NewsSource.Global => new GlobalPageParser(),
                 _ => throw new NotImplementedException(),

@@ -41,14 +41,14 @@ namespace PSO2News.Parsers
                 var page = await web.LoadFromWebAsync(curUrl, token);
 
                 var nextButton = page.DocumentNode.SelectSingleNode(NextButtonSelector);
-                curUrl = nextButton?.GetAttributeValue("href", null);
+                curUrl = GetNextPageUrl(nextButton);
 
                 var list = page.DocumentNode.SelectSingleNode(UlSelector);
 
                 foreach (var newsInfo in list.SelectNodes("li"))
                 {
                     var linkNode = newsInfo.SelectSingleNode(LinkSelector);
-                    var url = linkNode.GetAttributeValue("href", "");
+                    var url = GetLinkUrl(linkNode);
 
                     var typeNode = linkNode.SelectSingleNode(TypeSelector);
                     var newsType = ParseUtil.GetNewsTypeJP(typeNode.InnerText);
@@ -62,8 +62,8 @@ namespace PSO2News.Parsers
                         int.Parse(timeParts["year"].Value),
                         int.Parse(timeParts["month"].Value),
                         int.Parse(timeParts["day"].Value),
-                        int.Parse(timeParts["hour"].Value),
-                        int.Parse(timeParts["minute"].Value),
+                        int.Parse(timeParts["hour"].Success ? timeParts["hour"].Value : "0"),
+                        int.Parse(timeParts["minute"].Success ? timeParts["minute"].Value : "0"),
                         0);
                     if (parsedTime <= after)
                     {
@@ -78,6 +78,16 @@ namespace PSO2News.Parsers
                     };
                 }
             } while (curUrl != null);
+        }
+
+        protected virtual string GetLinkUrl(HtmlNode linkNode)
+        {
+            return linkNode.GetAttributeValue("href", "");
+        }
+
+        protected virtual string GetNextPageUrl(HtmlNode nextButton)
+        {
+            return nextButton?.GetAttributeValue("href", null);
         }
     }
 }
