@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using HtmlAgilityPack;
 using PSO2News.Content;
 
@@ -45,37 +47,49 @@ namespace PSO2News.Parsers
 
                 var list = page.DocumentNode.SelectSingleNode(UlSelector);
 
-                foreach (var newsInfo in list.SelectNodes("li"))
+                var jobs = list.SelectNodes("li")
+                    .Select(newsInfo => Task.Run(async () =>
+                    {
+                        var linkNode = newsInfo.SelectSingleNode(LinkSelector);
+                        var url = GetLinkUrl(linkNode);
+
+                        var typeNode = linkNode.SelectSingleNode(TypeSelector);
+                        var newsType = ParseUtil.GetNewsTypeJP(typeNode.InnerText);
+
+                        var titleNode = linkNode.SelectSingleNode(TitleSelector);
+                        var title = titleNode.InnerText.Trim();
+
+                        var timeNode = linkNode.SelectSingleNode(TimeSelector);
+                        var timeParts = ParseUtil.TimeRegexJP.Match(timeNode.InnerText).Groups;
+                        var parsedTime = new DateTime(int.Parse(timeParts["year"].Value), int.Parse(timeParts["month"].Value), int.Parse(timeParts["day"].Value), int.Parse(timeParts["hour"].Success ? timeParts["hour"].Value : "0"), int.Parse(timeParts["minute"].Success ? timeParts["minute"].Value : "0"), 0);
+                        if (parsedTime <= after)
+                        {
+                            return null;
+                        }
+
+                        return newsType switch
+                        {
+                            NewsType.Maintenance => await new MaintenanceNewsInfo(newsType, parsedTime, title, url).Parse(token),
+                            NewsType.Announcement when url.Contains("/comic") => await new ComicNewsInfo(newsType, parsedTime, title, url).Parse(token),
+                            _ => new NewsInfo(newsType, parsedTime, title, url),
+                        };
+                    }, token))
+                    .ToList();
+
+                await Task.WhenAll(jobs);
+
+                var newsInfos = jobs
+                    .Select(job => job.Result)
+                    .ToList();
+
+                foreach (var newsInfo in newsInfos.Where(newsInfo => newsInfo != null))
                 {
-                    var linkNode = newsInfo.SelectSingleNode(LinkSelector);
-                    var url = GetLinkUrl(linkNode);
+                    yield return newsInfo;
+                }
 
-                    var typeNode = linkNode.SelectSingleNode(TypeSelector);
-                    var newsType = ParseUtil.GetNewsTypeJP(typeNode.InnerText);
-
-                    var titleNode = linkNode.SelectSingleNode(TitleSelector);
-                    var title = titleNode.InnerText.Trim();
-
-                    var timeNode = linkNode.SelectSingleNode(TimeSelector);
-                    var timeParts = ParseUtil.TimeRegexJP.Match(timeNode.InnerText).Groups;
-                    var parsedTime = new DateTime(
-                        int.Parse(timeParts["year"].Value),
-                        int.Parse(timeParts["month"].Value),
-                        int.Parse(timeParts["day"].Value),
-                        int.Parse(timeParts["hour"].Success ? timeParts["hour"].Value : "0"),
-                        int.Parse(timeParts["minute"].Success ? timeParts["minute"].Value : "0"),
-                        0);
-                    if (parsedTime <= after)
-                    {
-                        yield break;
-                    }
-
-                    yield return newsType switch
-                    {
-                        NewsType.Maintenance => await new MaintenanceNewsInfo(newsType, parsedTime, title, url).Parse(token),
-                        NewsType.Announcement when url.Contains("/comic") => await new ComicNewsInfo(newsType, parsedTime, title, url).Parse(token),
-                        _ => new NewsInfo(newsType, parsedTime, title, url),
-                    };
+                if (newsInfos.Any(newsInfo => newsInfo == null))
+                {
+                    yield break;
                 }
             } while (curUrl != null);
         }
