@@ -1,4 +1,4 @@
-![Nuget](https://img.shields.io/nuget/v/PSO2News)
+[![Nuget](https://img.shields.io/nuget/v/PSO2News)](https://www.nuget.org/packages/PSO2News/)
 
 # PSO2News
 PSO2 news scraper.
