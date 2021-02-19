@@ -1,6 +1,6 @@
-# PSO2News
 ![Nuget](https://img.shields.io/nuget/v/PSO2News)
 
+# PSO2News
 PSO2 news scraper.
 
 Supports the following news sites:
