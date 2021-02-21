@@ -1,3 +1,5 @@
+[![Nuget](https://img.shields.io/nuget/v/PSO2News)](https://www.nuget.org/packages/PSO2News/)
+
 # PSO2News
 PSO2 news scraper.
 
@@ -21,3 +23,6 @@ await foreach (var post in tracker.GetNews().Where(n => n.Type == NewsType.Annou
     }
 }
 ```
+
+## Notes
+The [regex mess](https://github.com/karashiiro/PSO2News/blob/main/PSO2News/Content/MaintenanceNewsInfo.cs) I'm using for maintenance parsing does not catch every possible formatting case -- it particularly fails on unusual maintenance update announcements. In the event that a post fails to be parsed, the boolean property `Unreadable` will be set to true.
