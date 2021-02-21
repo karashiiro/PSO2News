@@ -62,6 +62,7 @@ namespace PSO2News.Parsers
                         var timeNode = linkNode.SelectSingleNode(TimeSelector);
                         var timeParts = ParseUtil.TimeRegexJP.Match(timeNode.InnerText).Groups;
                         var parsedTime = new DateTime(int.Parse(timeParts["year"].Value), int.Parse(timeParts["month"].Value), int.Parse(timeParts["day"].Value), int.Parse(timeParts["hour"].Success ? timeParts["hour"].Value : "0"), int.Parse(timeParts["minute"].Success ? timeParts["minute"].Value : "0"), 0);
+                        parsedTime = parsedTime.AddHours(-9);
                         if (parsedTime <= after)
                         {
                             return null;

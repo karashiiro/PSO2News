@@ -156,8 +156,8 @@ namespace PSO2News.Content
                     endHour = int.Parse(timeParts["endHour"].Value);
                     endMinute = int.Parse(timeParts["endMinute"].Value);
 
-                    StartTime = new DateTime(year, startMonth, startDay, startHour, startMinute, 0);
-                    EndTime = new DateTime(year, endMonth, endDay, endHour, endMinute, 0);
+                    StartTime = new DateTime(year, startMonth, startDay, startHour, startMinute, 0).AddHours(-9);
+                    EndTime = new DateTime(year, endMonth, endDay, endHour, endMinute, 0).AddHours(-9);
 
                     return this;
                 }
@@ -171,7 +171,7 @@ namespace PSO2News.Content
                     startHour = int.Parse(timeParts["startHour"].Value);
                     startMinute = int.Parse(timeParts["startMinute"].Value);
 
-                    StartTime = new DateTime(year, month, day, startHour, startMinute, 0);
+                    StartTime = new DateTime(year, month, day, startHour, startMinute, 0).AddHours(-9);
                     EndTime = default;
                     EndTimeUndecided = true;
 
@@ -205,8 +205,8 @@ namespace PSO2News.Content
                     endHour = int.Parse(timeParts["endHour"].Value);
                     endMinute = int.Parse(timeParts["endMinute"].Value);
 
-                    StartTime = new DateTime(year, startMonth, startDay, startHour, startMinute, 0);
-                    EndTime = new DateTime(year, endMonth, endDay, endHour, endMinute, 0);
+                    StartTime = new DateTime(year, startMonth, startDay, startHour, startMinute, 0).AddHours(-9);
+                    EndTime = new DateTime(year, endMonth, endDay, endHour, endMinute, 0).AddHours(-9);
 
                     return this;
                 }
@@ -301,7 +301,7 @@ namespace PSO2News.Content
                     startHour = int.Parse(timeParts["startHour"].Value);
                     startMinute = int.Parse(timeParts["startMinute"].Value);
 
-                    StartTime = new DateTime(year, month, day, startHour, startMinute, 0);
+                    StartTime = new DateTime(year, month, day, startHour, startMinute, 0).AddHours(-9);
                     EndTime = default;
                     EndTimeUndecided = true;
 
@@ -318,7 +318,7 @@ namespace PSO2News.Content
                     startHour = int.Parse(timeParts["startHour"].Value);
                     startMinute = int.Parse(timeParts["startMinute"].Value);
 
-                    StartTime = new DateTime(year, month, day, startHour, startMinute, 0);
+                    StartTime = new DateTime(year, month, day, startHour, startMinute, 0).AddHours(-9);
                     EndTime = default;
                     EndTimeUndecided = true;
 
@@ -336,7 +336,7 @@ namespace PSO2News.Content
                     startHour = int.Parse(timeParts["startHour"].Value);
                     startMinute = int.Parse(timeParts["startMinute"].Value);
 
-                    StartTime = new DateTime(year, month, day, startHour, startMinute, 0);
+                    StartTime = new DateTime(year, month, day, startHour, startMinute, 0).AddHours(-9);
                     EndTime = default;
                     EndTimeUndecided = true;
 
@@ -357,8 +357,8 @@ namespace PSO2News.Content
                     endHour = int.Parse(timeParts["endHour"].Value);
                     endMinute = int.Parse(timeParts["endMinute"].Value);
 
-                    StartTime = new DateTime(year, startMonth, startDay, startHour, startMinute, 0);
-                    EndTime = new DateTime(year, endMonth, endDay, endHour, endMinute, 0);
+                    StartTime = new DateTime(year, startMonth, startDay, startHour, startMinute, 0).AddHours(-9);
+                    EndTime = new DateTime(year, endMonth, endDay, endHour, endMinute, 0).AddHours(-9);
 
                     return this;
                 }
@@ -373,7 +373,7 @@ namespace PSO2News.Content
                     startHour = int.Parse(timeParts["startHour"].Value);
                     startMinute = int.Parse(timeParts["startMinute"].Value);
 
-                    StartTime = new DateTime(year, month, day, startHour, startMinute, 0);
+                    StartTime = new DateTime(year, month, day, startHour, startMinute, 0).AddHours(-9);
                     EndTime = default;
                     EndTimeUndecided = true;
 
@@ -390,7 +390,7 @@ namespace PSO2News.Content
                     startHour = int.Parse(timeParts["startHour"].Value);
                     startMinute = int.Parse(timeParts["startMinute"].Value);
 
-                    StartTime = new DateTime(year, month, day, startHour, startMinute, 0);
+                    StartTime = new DateTime(year, month, day, startHour, startMinute, 0).AddHours(-9);
                     EndTime = default;
                     EndTimeUndecided = true;
 
@@ -421,8 +421,8 @@ namespace PSO2News.Content
                 return this;
             }
 
-            StartTime = new DateTime(year, month, day, startHour, startMinute, 0);
-            EndTime = new DateTime(year, month, day, endHour, endMinute, 0);
+            StartTime = new DateTime(year, month, day, startHour, startMinute, 0).AddHours(-9);
+            EndTime = new DateTime(year, month, day, endHour, endMinute, 0).AddHours(-9);
 
             return this;
         }
